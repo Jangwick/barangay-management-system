@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Barangay Management System - Efficiently manage residents, documents, officials, and projects">
+    <title>{% block title %}Barangay Management System{% endblock %}</title>
+    
+    <!-- External CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Alpine.js for interactive components -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Skip to content link for keyboard users -->
+    <a href="#main-content" class="absolute top-0 left-0 -translate-y-full focus:translate-y-0 bg-blue-700 text-white p-2 z-50">Skip to main content</a>
+    
+    <header>
+        <nav class="bg-blue-800 text-white shadow-lg" aria-label="Main Navigation">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <i class="bi bi-buildings text-2xl"></i>
+                        <div class="text-xl font-bold">Barangay Management System</div>
+                    </div>
+                    
+                    <!-- Mobile menu button -->
+                    <div x-data="{ open: false }" class="relative md:hidden">
+                        <button @click="open = !open" class="focus:outline-none" aria-label="Open menu">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                        
+                        <!-- Mobile dropdown menu -->
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg py-1 z-50">
+                            <a href="/" class="block px-4 py-2 hover:bg-blue-100">Home</a>
+                            
+                            {% if current_user.is_authenticated %}
+                                <!-- Authenticated navigation links -->
+                                <a href="/residents" class="block px-4 py-2 hover:bg-blue-100">Residents</a>
+                                <a href="/officials" class="block px-4 py-2 hover:bg-blue-100">Officials</a>
+                                <a href="/documents" class="block px-4 py-2 hover:bg-blue-100">Documents</a>
+                                <a href="/projects" class="block px-4 py-2 hover:bg-blue-100">Projects</a>
+                                <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 hover:bg-blue-100">My Profile</a>
+                                {% if current_user.is_admin() %}
+                                    <a href="{{ url_for('admin.index') }}" class="block px-4 py-2 hover:bg-blue-100">Admin</a>
+                                {% endif %}
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 hover:bg-blue-100">Log Out</a>
+                            {% else %}
+                                <!-- Public navigation links -->
+                                <a href="{{ url_for('main.user_guide') }}" class="block px-4 py-2 hover:bg-blue-100">User Guide</a>
+                                <a href="{{ url_for('main.contact_support') }}" class="block px-4 py-2 hover:bg-blue-100">Contact Support</a>
+                                <a href="{{ url_for('auth.login') }}" class="block px-4 py-2 hover:bg-blue-100">Log In</a>
+                                <a href="{{ url_for('auth.register') }}" class="block px-4 py-2 hover:bg-blue-100">Register</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Desktop navigation -->
+                    <div class="hidden md:flex items-center space-x-6">
+                        <a href="/" class="hover:text-blue-200" aria-current="{{ 'page' if request.path == '/' else 'false' }}">Home</a>
+                        
+                        {% if current_user.is_authenticated %}
+                            <!-- Authenticated navigation links -->
+                            <a href="/residents" class="hover:text-blue-200" aria-current="{{ 'page' if '/residents' in request.path else 'false' }}">Residents</a>
+                            <a href="/officials" class="hover:text-blue-200" aria-current="{{ 'page' if '/officials' in request.path else 'false' }}">Officials</a>
+                            <a href="/documents" class="hover:text-blue-200" aria-current="{{ 'page' if '/documents' in request.path else 'false' }}">Documents</a>
+                            <a href="/projects" class="hover:text-blue-200" aria-current="{{ 'page' if '/projects' in request.path else 'false' }}">Projects</a>
+                            
+                            <div x-data="{ open: false }" class="relative">
+                                <button @click="open = !open" class="flex items-center hover:text-blue-200 focus:outline-none">
+                                    <span class="mr-1">{{ current_user.username }}</span>
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </button>
+                                <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg py-1 z-50">
+                                    <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 hover:bg-blue-100">My Profile</a>
+                                    {% if current_user.is_admin() %}
+                                        <a href="{{ url_for('admin.index') }}" class="block px-4 py-2 hover:bg-blue-100">Admin Dashboard</a>
+                                    {% endif %}
+                                    <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 hover:bg-blue-100">Log Out</a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- Public navigation links -->
+                            <a href="{{ url_for('main.user_guide') }}" class="hover:text-blue-200">User Guide</a>
+                            <a href="{{ url_for('main.contact_support') }}" class="hover:text-blue-200">Contact</a>
+                            <a href="{{ url_for('auth.login') }}" class="hover:text-blue-200">Log In</a>
+                            <a href="{{ url_for('auth.register') }}" class="bg-white text-blue-800 py-1 px-3 rounded hover:bg-blue-100">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" class="flex-grow container mx-auto px-4 py-6">
+        <!-- Breadcrumbs -->
+        <nav aria-label="Breadcrumb" class="mb-4">
+            <ol class="flex text-sm text-gray-600">
+                {% block breadcrumb %}
+                <li class="flex items-center">
+                    <a href="/">Home</a>
+                    {% if request.path != '/' %}
+                    <span class="mx-2">/</span>
+                    {% endif %}
+                </li>
+                {% endblock %}
+            </ol>
+        </nav>
+        
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div role="alert" class="mb-4 p-4 rounded-md 
+                        {% if category == 'success' %}bg-green-100 text-green-700
+                        {% elif category == 'error' %}bg-red-100 text-red-700
+                        {% elif category == 'warning' %}bg-yellow-100 text-yellow-700
+                        {% else %}bg-blue-100 text-blue-700{% endif %}">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                {% if category == 'success' %}
+                                    <i class="fas fa-check-circle" aria-hidden="true"></i>
+                                {% elif category == 'error' %}
+                                    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                                {% elif category == 'warning' %}
+                                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle" aria-hidden="true"></i>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <p>{{ message }}</p>
+                            </div>
+                            <div class="ml-auto">
+                                <button type="button" class="dismiss-alert" aria-label="Close">
+                                    <i class="fas fa-times" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Main content -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-blue-800 text-white py-8 mt-auto">
+        <div class="container mx-auto px-4">
+            <div class="md:flex md:justify-between">
+                <div class="mb-6 md:mb-0">
+                    <h2 class="text-lg font-bold mb-2">Barangay Management System</h2>
+                    <p class="text-sm text-blue-200">Efficiently manage your barangay's residents, officials, documents, and projects.</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-8 sm:gap-12">
+                    <div>
+                        <h3 class="text-md font-semibold mb-2">Quick Links</h3>
+                        <ul class="text-sm">
+                            <li class="mb-1"><a href="/" class="text-blue-200 hover:text-white">Home</a></li>
+                            {% if current_user.is_authenticated %}
+                                <li class="mb-1"><a href="/residents" class="text-blue-200 hover:text-white">Residents</a></li>
+                                <li class="mb-1"><a href="/officials" class="text-blue-200 hover:text-white">Officials</a></li>
+                                <li class="mb-1"><a href="/documents" class="text-blue-200 hover:text-white">Documents</a></li>
+                                <li class="mb-1"><a href="/projects" class="text-blue-200 hover:text-white">Projects</a></li>
+                            {% else %}
+                                <li class="mb-1"><a href="{{ url_for('auth.login') }}" class="text-blue-200 hover:text-white">Log In</a></li>
+                                <li class="mb-1"><a href="{{ url_for('auth.register') }}" class="text-blue-200 hover:text-white">Register</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-md font-semibold mb-2">Help & Support</h3>
+                        <ul class="text-sm">
+                            <li class="mb-1"><a href="{{ url_for('main.user_guide') }}" class="text-blue-200 hover:text-white">User Guide</a></li>
+                            <li class="mb-1"><a href="{{ url_for('main.contact_support') }}" class="text-blue-200 hover:text-white">Contact Support</a></li>
+                            {% if current_user.is_authenticated and current_user.is_admin() %}
+                                <li class="mb-1"><a href="{{ url_for('admin.index') }}" class="text-blue-200 hover:text-white">Admin Dashboard</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4 border-blue-700">
+            
+            <div class="text-sm text-center text-blue-200">
+                &copy; {{ now.year }} Barangay Management System. All rights reserved.
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Accessibility script -->
+    <script>
+        // Close alert messages
+        document.addEventListener('DOMContentLoaded', function() {
+            const dismissButtons = document.querySelectorAll('.dismiss-alert');
+            dismissButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const alert = this.closest('[role="alert"]');
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 300);
+                });
+            });
+            
+            // Automatically set current date in date inputs
+            const currentDateInputs = document.querySelectorAll('input[data-set-current-date="true"]');
+            if (currentDateInputs.length) {
+                const today = new Date().toISOString().split('T')[0];
+                currentDateInputs.forEach(input => {
+                    if (!input.value) {
+                        input.value = today;
+                    }
+                });
+            }
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

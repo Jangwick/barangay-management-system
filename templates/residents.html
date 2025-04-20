@@ -1,0 +1,97 @@
+{% extends 'layout.html' %}
+
+{% block title %}Residents Directory | Barangay Management System{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <a href="/">Home</a>
+    <span class="mx-2">/</span>
+</li>
+<li class="flex items-center">
+    <a href="/residents" aria-current="page">Residents</a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-blue-800">Residents Directory</h1>
+        <a href="/residents/add" class="bg-blue-800 text-white py-2 px-4 rounded hover:bg-blue-700">Add New Resident</a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-3 px-4 text-left">Name</th>
+                    <th class="py-3 px-4 text-left">Address</th>
+                    <th class="py-3 px-4 text-left">Contact</th>
+                    <th class="py-3 px-4 text-left">Age</th>
+                    <th class="py-3 px-4 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resident in residents %}
+                <tr class="border-t hover:bg-gray-50">
+                    <td class="py-3 px-4">{{ resident.first_name }} {{ resident.last_name }}</td>
+                    <td class="py-3 px-4">{{ resident.address }}</td>
+                    <td class="py-3 px-4">
+                        {% if resident.contact_number %}
+                        <a href="tel:{{ resident.contact_number }}" class="hover:underline">{{ resident.contact_number }}</a>
+                        {% else %}
+                        <span class="text-gray-400">Not provided</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3 px-4">{{ calculate_age(resident.birth_date) }}</td>
+                    <td class="py-3 px-4">
+                        <a href="{{ url_for('residents.view_resident', resident_id=resident.id) }}" class="text-blue-600 hover:underline mr-2">View</a>
+                        <a href="{{ url_for('residents.edit_resident', resident_id=resident.id) }}" class="text-green-600 hover:underline mr-2">Edit</a>
+                        <button onclick="confirmDelete('{{ resident.id }}', '{{ resident.first_name }} {{ resident.last_name }}')" class="text-red-600 hover:underline">Delete</button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="py-4 px-4 text-center text-gray-500">No residents found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6" role="dialog" aria-labelledby="deleteModalTitle" aria-modal="true">
+        <h2 id="deleteModalTitle" class="text-xl font-bold text-red-600 mb-4">Confirm Deletion</h2>
+        <p class="text-gray-700 mb-6">Are you sure you want to delete <span id="residentName" class="font-medium"></span>? This action cannot be undone.</p>
+        
+        <form id="deleteForm" method="POST" class="flex justify-end space-x-4">
+            <button type="button" onclick="closeDeleteModal()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">
+                Cancel
+            </button>
+            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                Delete
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(residentId, residentName) {
+        document.getElementById('residentName').textContent = residentName;
+        document.getElementById('deleteForm').action = `/residents/${residentId}/delete`;
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+    
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+    
+    // Close modal when pressing Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeDeleteModal();
+        }
+    });
+</script>
+{% endblock %}

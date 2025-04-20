@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block title %}Login | Barangay Management System{% endblock %}
+
+{% block breadcrumb %}
+<li class="flex items-center">
+    <a href="/">Home</a>
+    <span class="mx-2">/</span>
+</li>
+<li class="flex items-center">
+    <a href="{{ url_for('auth.login') }}" aria-current="page">Login</a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="flex justify-center items-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-bold text-blue-800 mb-6 text-center">Login to Your Account</h1>
+        
+        <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-6">
+            <div>
+                <label for="username" class="block text-gray-700 font-medium mb-2">Username</label>
+                <input type="text" name="username" id="username" required autofocus
+                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+                <input type="password" name="password" id="password" required
+                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div class="flex items-center">
+                <input type="checkbox" name="remember" id="remember" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                <label for="remember" class="ml-2 block text-gray-700">Remember me</label>
+            </div>
+            
+            <div>
+                <button type="submit" class="w-full bg-blue-800 text-white py-2 px-4 rounded hover:bg-blue-700">
+                    Log In
+                </button>
+            </div>
+            
+            <div class="text-center text-gray-600">
+                Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-blue-600 hover:underline">Register</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
