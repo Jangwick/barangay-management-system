@@ -133,11 +133,26 @@ admin = User(
     is_active=True
 )
 admin.set_password("secure_password")
+#
 
 # Add to database
 db.session.add(admin)
 db.session.commit()
 ```
+
+## Default Admin Account
+
+The system comes with a default administrator account with the following credentials:
+
+```
+Username: admin
+Email: admin@example.com
+Password: admin123
+First Name: System
+Last Name: Administrator
+```
+
+⚠️ **IMPORTANT**: For security reasons, please change the default password immediately after your first login.
 
 ## 👥 User Roles
 

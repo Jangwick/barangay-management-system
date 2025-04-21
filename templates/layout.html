@@ -17,6 +17,20 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     {% block extra_head %}{% endblock %}
+
+    <!-- Chatbot styles -->
+    <style>
+        #chatbot {
+            z-index: 9999;
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+        }
+        #chat-window {
+            width: 24rem;
+            max-height: calc(100vh - 6rem);
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <!-- Skip to content link for keyboard users -->
@@ -230,5 +244,6 @@
     </script>
     
     {% block scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
 </body>
 </html>

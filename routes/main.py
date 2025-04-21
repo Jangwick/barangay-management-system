@@ -3,8 +3,12 @@ from datetime import datetime, timedelta
 from models.resident import Resident
 from models.official import Official
 from models.document import Document
-from models.project import Project
+from models.project import Project 
+from models import db
 from sqlalchemy import func
+from utils import ChatbotAI  # Updated import statement
+
+chatbot_ai = ChatbotAI()
 
 main = Blueprint('main', __name__)
 
@@ -74,3 +78,16 @@ def contact_support():
         return redirect(url_for('main.contact_support'))
     
     return render_template('contact_support.html')
+
+@main.route('/api/chatbot', methods=['POST'])
+def chatbot():
+    try:
+        message = request.json.get('message', '').lower()
+        response = chatbot_ai.get_response(message, db)
+        return jsonify(response)
+    except Exception as e:
+        print(f"Chatbot API error: {str(e)}")
+        return jsonify({
+            'message': 'Sorry, I encountered an error. Please try again.',
+            'links': [{'url': url_for('main.contact_support'), 'text': 'Contact Support'}]
+        }), 500
