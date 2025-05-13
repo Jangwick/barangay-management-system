@@ -37,6 +37,16 @@
             <p class="text-blue-700">Resident management</p>
         </a>
         
+        <a href="{{ url_for('admin.list_blotters') }}" class="bg-red-100 p-6 rounded-lg shadow hover:shadow-lg transition-shadow"> {# New Blotter Card #}
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-red-800">Blotter Records</h2>
+                <span class="bg-red-200 text-red-800 p-2 rounded-full">
+                    <i class="fas fa-book" aria-hidden="true"></i> {# Example icon, choose one that fits #}
+                </span>
+            </div>
+            <p class="text-red-700">Manage blotter records and incidents</p>
+        </a>
+
         <a href="/documents" class="bg-yellow-100 p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-bold text-yellow-800">Documents</h2>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Barangay Management System{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        nav { background-color: #333; color: white; padding: 1em; }
+        nav ul { list-style-type: none; padding: 0; margin: 0; display: flex; }
+        nav ul li { margin-right: 20px; }
+        nav ul li a { color: white; text-decoration: none; }
+        nav ul li a:hover { text-decoration: underline; }
+        .container { padding: 20px; }
+    </style>
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            
+            {# Example: Conditional links based on user role #}
+            {% if current_user and current_user.is_authenticated %}
+                {# Simplified condition for admin links for testing visibility #}
+                {# Original: {% if current_user.is_admin %} #}
+                <li><a href="{{ url_for('admin_resident_list') }}">Manage Residents</a></li>
+                <li><a href="{{ url_for('admin_blotter_list') }}">Manage Blotters (Admin)</a></li> 
+                <li><a href="{{ url_for('admin_add_blotter') }}">Add New Blotter</a></li> {# New link added here #}
+                {# End Original: {% endif %} #}
+
+                {# User-specific links - ensure these routes exist #}
+                {# Original: {% else %} #}
+                {% if not current_user.is_admin %} {# Or simply remove this condition if current_user.is_admin is not yet reliable #}
+                <li><a href="{{ url_for('user_report_blotter') }}">Report Incident</a></li>
+                <li><a href="{{ url_for('user_blotter_status') }}">My Blotter Reports</a></li>
+                {% endif %}
+                {# End Original: {% endif %} #}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                {# To make blotter reporting accessible even if not logged in (if your app supports this) #}
+                {# You might need a different route or handling for anonymous reports #}
+                <li><a href="{{ url_for('user_report_blotter') }}">Report Incident (Guest)</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>&copy; {{ "now"|date("Y") }} Barangay Management System</p>
+    </footer>
+</body>
+</html>

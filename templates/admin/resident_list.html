@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Resident Records</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Resident Records (Admin View)</h1>
+    <a href="{{ url_for('admin_add_resident') }}">Add New Resident</a>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Address</th>
+                <th>Contact Number</th>
+                <th>Email</th>
+                <th>Birth Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for resident in residents %}
+            <tr>
+                <td>{{ resident.id }}</td>
+                <td>{{ resident.first_name }}</td>
+                <td>{{ resident.last_name }}</td>
+                <td>{{ resident.address }}</td>
+                <td>{{ resident.contact_number }}</td>
+                <td>{{ resident.email }}</td>
+                <td>{{ resident.birth_date.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    <a href="{{ url_for('admin_edit_resident', resident_id=resident.id) }}">Edit</a>
+                    <a href="{{ resident.get_absolute_url() }}">View</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8">No resident records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
